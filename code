@@ -1,0 +1,149 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[20]:
+
+
+import numpy as np
+import pandas as pd
+
+
+# In[22]:
+
+
+txt_file = pd.read_table("chipotle.tsv")
+
+
+# In[23]:
+
+
+txt_file.head(10)
+txt_file.tail(10)
+
+
+# In[24]:
+
+
+for column, dtype in zip(txt_file.columns, txt_file.dtypes):
+    print(f"{column}:{dtype}")
+
+
+# In[25]:
+
+
+txt_file['item_price'] = txt_file['item_price'].str.replace('$', '')
+txt_file['item_price'] = txt_file['item_price'].astype('float64')
+print(txt_file['item_price'].head(4))
+
+
+# In[26]:
+
+
+dataset_null = txt_file.isnull()
+print(dataset_null) 
+
+
+# In[27]:
+
+
+print(txt_file.isnull().sum())
+
+
+# In[28]:
+
+
+print(txt_file['choice_description'].isnull().sum())
+
+
+# In[29]:
+
+
+percent_missing_dataset = txt_file.isnull().mean()*100
+print(percent_missing_dataset)
+
+
+# In[30]:
+
+
+distinct_entries = txt_file.loc[txt_file['choice_description'].isnull(), 'item_name'].unique()
+print(distinct_entries)
+
+
+# In[32]:
+
+
+count_distinct_entries= txt_file[txt_file['choice_description'].isnull()]['item_name'].nunique()
+print("Number of unique item_name with null description:", count_distinct_entries)
+
+
+# In[38]:
+
+
+txt_file['choice_description'] = txt_file['choice_description'].fillna('Regular Order')
+
+regular_orders = txt_file[txt_file['choice_description'] == 'Regular Order'].to_string(index=False)
+# Display the selected rows
+print(regular_orders)
+
+
+# In[34]:
+
+
+print(txt_file.isnull().sum())
+
+
+# In[35]:
+
+
+count_duplicates = txt_file[txt_file.duplicated()].shape[0]
+print("Number of duplicate rows:", count_duplicates)
+
+
+# In[40]:
+
+
+duplicates = txt_file[txt_file.duplicated(keep=False)]
+duplicates_sorted = duplicates.sort_values(by=['order_id'])
+print(duplicates_sorted.to_string(index=False))
+
+
+# In[42]:
+
+
+#delete the duplicate entries
+txt_file.drop_duplicates(inplace=True)
+
+
+# In[43]:
+
+
+count_duplicates = txt_file[txt_file.duplicated()].shape[0]
+print("Number of duplicate rows:", count_duplicates)
+
+duplicates = txt_file[txt_file.duplicated(keep=False)]
+duplicates_sorted = duplicates.sort_values(by=['order_id'])
+print(duplicates_sorted.to_string(index=False))
+
+
+# In[44]:
+
+
+# Iterate through each column in the dataframe
+for col in txt_file.columns:
+    # Check if the column is a string column
+    if txt_file[col].dtype == 'object':
+        # Remove extra spaces from each string in the column
+        txt_file[col] = txt_file[col].str.strip()
+
+
+# In[46]:
+
+
+txt_file.to_csv('cleaned_data.csv', index=False)
+
+
+# In[ ]:
+
+
+
+
